@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const _ = require("lodash");
 const dotenv = require("dotenv");
 dotenv.config();
+const port = process.env.PORT || 3000;
 
 const app = express();
 const userName = process.env.USER_NAME;
@@ -44,7 +45,7 @@ const item3 = new Item({
   name: "MongoDB",
 });
 
-//array of documents
+// //array of documents
 const defaultItems = [item1, item2, item3];
 
 // creating new list schema
@@ -59,23 +60,10 @@ const List = mongoose.model("List", listSchema);
 // using get method
 app.get("/", function (req, res) {
   Item.find({}, (error, items) => {
-    if (items.length === 0) {
-      Item.insertMany(defaultItems, (error) => {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("successfully saved items to DB");
-        }
-      });
-      res.redirect("/");
-    }
-    if (items.length > 0) {
-      console.log(items);
-      res.render("list", {
-        listTitle: "Manage Your Daily Activites",
-        newListItems: items,
-      });
-    }
+    res.render("list", {
+      listTitle: "Manage Your Daily Activites",
+      newListItems: items,
+    });
   });
 });
 
@@ -89,7 +77,6 @@ app.get("/:customListName", (req, res) => {
           name: customListName,
           items: defaultItems,
         });
-
         list.save();
         res.redirect("/" + customListName);
       } else {
@@ -111,7 +98,6 @@ app.post("/", function (req, res) {
   if (itemName === "") {
     return;
   }
-
   const item = new Item({
     name: itemName,
   });
@@ -154,6 +140,6 @@ app.post("/delete", (req, res) => {
 });
 
 // server listen on port 3000
-app.listen(3000, function () {
-  console.log("Server started on port 3000");
+app.listen(port, function () {
+  console.log(`Server started on port ${port} `);
 });
